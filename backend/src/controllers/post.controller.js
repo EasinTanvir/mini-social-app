@@ -11,7 +11,7 @@ const {
   toggleLikeService,
   createCommentService,
 } = require("../services/post.service");
-const errorHandler = require("../utils/errorHandler");
+const { errorHandler } = require("../utils/errorHandler");
 
 module.exports = {
   createPostController: async (req, res, next) => {
@@ -32,11 +32,11 @@ module.exports = {
 
   getPostsController: async (req, res, next) => {
     try {
-      const page = Number(req.query.page) || 1;
-      const limit = Number(req.query.limit) || 10;
-      const username = req.query.username;
+      const page = Math.max(1, parseInt(req.query.page) || 1);
+      const limit = Math.max(1, Math.min(50, parseInt(req.query.limit) || 10));
+      const username = req.query.username?.trim() || undefined;
 
-      const data = await getPostsService(page, limit, username);
+      const data = await getPostsService(req.userId, page, limit, username);
 
       return res.status(StatusCodes.OK).json({
         success: true,

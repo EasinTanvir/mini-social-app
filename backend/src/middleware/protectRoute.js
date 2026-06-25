@@ -15,7 +15,7 @@ module.exports = async (req, res, next) => {
     const token = authorization.split(" ")[1];
 
     const decoded = verifyJwt(token);
-    console.log({ decoded });
+
     if (!decoded) {
       throw new HttpError("Invalid or expired token", StatusCodes.UNAUTHORIZED);
     }

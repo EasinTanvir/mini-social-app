@@ -18,66 +18,67 @@ module.exports = {
   },
 
   getPostsService: async (userId, page, limit, username) => {
-    const skip = (page - 1) * limit;
+    const safePage = Math.max(1, parseInt(page) || 1);
+    const safeLimit = Math.max(1, Math.min(50, parseInt(limit) || 10));
+    const skip = (safePage - 1) * safeLimit;
 
     const where = username
       ? {
           author: {
-            username,
+            username: {
+              equals: username,
+              mode: "insensitive",
+            },
           },
         }
       : {};
 
-    const posts = await prismaCli.post.findMany({
-      where,
-      skip,
-      take: limit,
-      orderBy: {
-        createdAt: "desc",
-      },
-      include: {
-        author: {
-          select: {
-            id: true,
-            username: true,
-          },
+    const [posts, total] = await prismaCli.$transaction([
+      prismaCli.post.findMany({
+        where,
+        skip,
+        take: safeLimit,
+        orderBy: {
+          createdAt: "desc",
         },
-
-        _count: {
-          select: {
-            likes: true,
-            comments: true,
+        include: {
+          author: {
+            select: {
+              id: true,
+              username: true,
+            },
           },
-        },
-
-        likes: {
-          where: {
-            userId,
+          _count: {
+            select: {
+              likes: true,
+              comments: true,
+            },
           },
-          select: {
-            id: true,
+          likes: {
+            where: {
+              userId,
+            },
+            select: {
+              id: true,
+            },
           },
-        },
-
-        comments: {
-          orderBy: {
-            createdAt: "asc",
-          },
-          include: {
-            user: {
-              select: {
-                id: true,
-                username: true,
+          comments: {
+            orderBy: {
+              createdAt: "asc",
+            },
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  username: true,
+                },
               },
             },
           },
         },
-      },
-    });
-
-    const total = await prismaCli.post.count({
-      where,
-    });
+      }),
+      prismaCli.post.count({ where }),
+    ]);
 
     const formattedPosts = posts.map((post) => ({
       id: post.id,
@@ -85,19 +86,18 @@ module.exports = {
       author: post.author,
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
-
       likeCount: post._count.likes,
       commentCount: post._count.comments,
-
       likedByMe: post.likes.length > 0,
-
       comments: post.comments,
     }));
 
     return {
-      page,
-      limit,
+      page: safePage,
+      limit: safeLimit,
       total,
+      totalPages: Math.ceil(total / safeLimit),
+      hasNextPage: safePage < Math.ceil(total / safeLimit),
       posts: formattedPosts,
     };
   },
