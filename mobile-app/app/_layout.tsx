@@ -1,16 +1,19 @@
+import {
+  GlobalContextProvider,
+  useGlobalContext,
+} from "@/contextApis/GlobalContext";
 import { Stack } from "expo-router";
 import React from "react";
 
 const LayoutWrapper = () => {
-  //for now hard coded
-  const isAuthenticated = false;
+  const { isLoggedIn } = useGlobalContext();
   return (
     <Stack>
-      <Stack.Protected guard={isAuthenticated}>
+      <Stack.Protected guard={isLoggedIn}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       </Stack.Protected>
 
-      <Stack.Protected guard={!isAuthenticated}>
+      <Stack.Protected guard={!isLoggedIn}>
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="register" options={{ headerShown: false }} />
       </Stack.Protected>
@@ -20,9 +23,9 @@ const LayoutWrapper = () => {
 
 const RootLayout = () => {
   return (
-    <React.Fragment>
+    <GlobalContextProvider>
       <LayoutWrapper />
-    </React.Fragment>
+    </GlobalContextProvider>
   );
 };
 export default RootLayout;
