@@ -1,6 +1,6 @@
 const express = require("express");
 
-const protectRoute = require("../middlewares/protectRoute");
+const protectRoute = require("../middleware/protectRoute");
 
 const {
   createPostController,
