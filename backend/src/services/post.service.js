@@ -2,6 +2,7 @@ const { StatusCodes } = require("http-status-codes");
 
 const { prismaCli } = require("../utils/prismaCli");
 const { HttpError } = require("../utils/HttpError");
+const { sendFCMNotification } = require("../utils/firebase");
 
 module.exports = {
   createPostService: async (userId, { text }) => {
@@ -142,6 +143,20 @@ module.exports = {
       },
     });
 
+    if (post.authorId !== userId) {
+      const author = await prismaCli.user.findUnique({
+        where: { id: post.authorId },
+        select: { fcmToken: true, username: true },
+      });
+      if (author?.fcmToken) {
+        await sendFCMNotification(author.fcmToken, {
+          title: "New Like ❤️",
+          body: `Someone liked your post`,
+          data: { postId },
+        });
+      }
+    }
+
     return {
       liked: true,
       message: "Post liked successfully",
@@ -174,6 +189,22 @@ module.exports = {
         },
       },
     });
+
+    if (post.authorId !== userId) {
+      const author = await prismaCli.user.findUnique({
+        where: { id: post.authorId },
+        select: { fcmToken: true },
+      });
+      if (author?.fcmToken) {
+        await sendFCMNotification(author.fcmToken, {
+          title: "New Comment 💬",
+          body: comment.user.username
+            ? `${comment.user.username} commented on your post`
+            : "Someone commented on your post",
+          data: { postId },
+        });
+      }
+    }
 
     return {
       message: "Comment added successfully",
