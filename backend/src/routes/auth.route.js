@@ -5,6 +5,7 @@ const {
   loginController,
 } = require("../controllers/auth.controller");
 const { prismaCli } = require("../utils/prismaCli");
+const protectRoute = require("../middleware/protectRoute");
 
 const router = express.Router();
 

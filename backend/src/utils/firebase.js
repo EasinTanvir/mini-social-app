@@ -1,9 +1,21 @@
-const admin = require("firebase-admin");
-const serviceAccount = require("../../firebase-service-account.json");
+// In v14, everything for initialization is cleanly imported from 'firebase-admin/app'
+const { initializeApp, getApps, cert } = require("firebase-admin/app");
+const { messaging } = require("firebase-admin");
 
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
+let serviceAccount;
+try {
+  serviceAccount = require("../../firebase-service-account.json");
+} catch (e) {
+  console.error("firebase-service-account.json not found:", e.message);
+  process.exit(1);
+}
+
+// Check initialized state using standard getApps()
+const apps = getApps();
+if (!apps || !apps.length) {
+  initializeApp({
+    // Fix: Pass your service account directly into the standalone cert() function
+    credential: cert(serviceAccount),
   });
 }
 
@@ -11,7 +23,7 @@ const sendFCMNotification = async (fcmToken, { title, body, data = {} }) => {
   if (!fcmToken) return;
 
   try {
-    await admin.messaging().send({
+    await messaging().send({
       token: fcmToken,
       notification: { title, body },
       data,
@@ -25,7 +37,6 @@ const sendFCMNotification = async (fcmToken, { title, body, data = {} }) => {
     });
     console.log("FCM sent:", title);
   } catch (error) {
-    // Token expired or invalid — clear it from DB
     if (
       error.code === "messaging/registration-token-not-registered" ||
       error.code === "messaging/invalid-registration-token"
