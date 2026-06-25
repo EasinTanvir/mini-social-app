@@ -49,7 +49,7 @@ module.exports = {
 
   likePostController: async (req, res, next) => {
     try {
-      const data = await toggleLikeService(req.user.id, req.params.id);
+      const data = await toggleLikeService(req.userId, req.params.id);
 
       return res.status(StatusCodes.OK).json({
         success: true,
@@ -65,7 +65,7 @@ module.exports = {
       const validatedData = commentSchema.parse(req.body);
 
       const data = await createCommentService(
-        req.user.id,
+        req.userId,
         req.params.id,
         validatedData,
       );
