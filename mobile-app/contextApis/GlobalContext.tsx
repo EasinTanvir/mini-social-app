@@ -1,38 +1,30 @@
+import React, { createContext, useContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
 
-type User = {
+interface User {
   id: string;
   username: string;
   email: string;
-};
+}
 
-type SearchContextType = {
+interface GlobalContextType {
+  loading: boolean;
   isLoggedIn: boolean;
   user: User | null;
   token: string | null;
-  loading: boolean;
-
   login: (user: User, token: string) => Promise<void>;
   logout: () => Promise<void>;
-};
+}
 
-const SearchContext = createContext<SearchContextType | undefined>(undefined);
+const GlobalContext = createContext<GlobalContextType | undefined>(undefined);
 
-type SearchProviderProps = {
-  children: ReactNode;
-};
-
-export const GlobalContextProvider = ({ children }: SearchProviderProps) => {
+export const GlobalContextProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
 
@@ -50,52 +42,51 @@ export const GlobalContextProvider = ({ children }: SearchProviderProps) => {
         setToken(storedToken);
         setIsLoggedIn(true);
       }
+    } catch (e) {
+      console.error("Failed to load session", e);
     } finally {
       setLoading(false);
     }
   };
 
-  const login = async (user: User, token: string) => {
-    await AsyncStorage.setItem("user", JSON.stringify(user));
-    await AsyncStorage.setItem("token", token);
-
-    setUser(user);
-    setToken(token);
-    setIsLoggedIn(true);
+  const login = async (newUser: User, newToken: string) => {
+    try {
+      await AsyncStorage.setItem("user", JSON.stringify(newUser));
+      await AsyncStorage.setItem("token", newToken);
+      setUser(newUser);
+      setToken(newToken);
+      setIsLoggedIn(true);
+    } catch (e) {
+      console.error("Failed to save login session", e);
+    }
   };
 
   const logout = async () => {
-    await AsyncStorage.removeMany(["user", "token"]);
-
-    setUser(null);
-    setToken(null);
-    setIsLoggedIn(false);
+    try {
+      await AsyncStorage.multiRemove(["user", "token"]);
+      setUser(null);
+      setToken(null);
+      setIsLoggedIn(false);
+    } catch (e) {
+      console.error("Failed to clear login session", e);
+    }
   };
 
   return (
-    <SearchContext.Provider
-      value={{
-        loading,
-        isLoggedIn,
-        user,
-        token,
-        login,
-        logout,
-      }}
+    <GlobalContext.Provider
+      value={{ loading, isLoggedIn, user, token, login, logout }}
     >
       {children}
-    </SearchContext.Provider>
+    </GlobalContext.Provider>
   );
 };
 
 export const useGlobalContext = () => {
-  const context = useContext(SearchContext);
-
+  const context = useContext(GlobalContext);
   if (!context) {
     throw new Error(
       "useGlobalContext must be used within GlobalContextProvider",
     );
   }
-
   return context;
 };

@@ -11,13 +11,14 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 
 import FormInput from "@/components/FormInput";
 import { loginSchema } from "@/validations/auth.validation";
 import { LoginRequest } from "@/types/auth.types";
 import { loginUser } from "@/services/auth.service";
+import { useGlobalContext } from "@/contextApis/GlobalContext";
 
 const LoginPage = () => {
   const {
@@ -32,13 +33,19 @@ const LoginPage = () => {
     },
   });
 
+  const { login } = useGlobalContext();
+
+  const router = useRouter();
+
   const onSubmit = async (data: LoginRequest) => {
     try {
       const res = await loginUser(data);
 
       Alert.alert("Success", res.message);
 
-      console.log(res);
+      await login(res.user, res.token);
+
+      router.replace("/(tabs)");
     } catch (error: any) {
       Alert.alert(
         "Error",
