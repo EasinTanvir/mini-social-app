@@ -1,29 +1,124 @@
-import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useRef, useState } from "react";
+import {
+  Animated,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useGlobalContext } from "@/contextApis/GlobalContext";
 
-export const BrandHeader = () => {
+interface Props {
+  onSearch: (username: string) => void;
+}
+
+export const BrandHeader = ({ onSearch }: Props) => {
   const insets = useSafeAreaInsets();
   const { logout } = useGlobalContext();
 
+  const [searchMode, setSearchMode] = useState(false);
+  const [query, setQuery] = useState("");
+  const inputRef = useRef<TextInput>(null);
+  const widthAnim = useRef(new Animated.Value(0)).current;
+
+  const openSearch = () => {
+    setSearchMode(true);
+    Animated.spring(widthAnim, {
+      toValue: 1,
+      useNativeDriver: false,
+      bounciness: 0,
+    }).start(() => inputRef.current?.focus());
+  };
+
+  const closeSearch = () => {
+    setQuery("");
+    onSearch("");
+    setSearchMode(false);
+    Animated.timing(widthAnim, {
+      toValue: 0,
+      duration: 200,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  const handleChangeText = (text: string) => {
+    setQuery(text);
+    // debounce: fire after user pauses 400ms
+    if (handleChangeText._timer) clearTimeout(handleChangeText._timer);
+    handleChangeText._timer = setTimeout(() => onSearch(text.trim()), 400);
+  };
+  handleChangeText._timer = null as any;
+
+  const animatedWidth = widthAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0%", "65%"],
+  });
+
   return (
     <View style={[styles.headerContainer, { paddingTop: insets.top + 10 }]}>
-      <View style={styles.brandWrapper}>
-        <Text style={styles.brandText}>
-          Source<Text style={styles.brandAccent}>Club</Text>
-        </Text>
-      </View>
+      {/* Brand — hidden when search is open */}
+      {!searchMode && (
+        <View style={styles.brandWrapper}>
+          <Text style={styles.brandText}>
+            Source<Text style={styles.brandAccent}>Club</Text>
+          </Text>
+        </View>
+      )}
 
-      <TouchableOpacity
-        style={styles.logoutButton}
-        onPress={logout}
-        activeOpacity={0.7}
-      >
-        <Ionicons name="log-out-outline" size={20} color="#EF4444" />
-        <Text style={styles.logoutText}>Logout</Text>
-      </TouchableOpacity>
+      {/* Animated search bar */}
+      {searchMode && (
+        <Animated.View style={[styles.searchBar, { width: animatedWidth }]}>
+          <Ionicons name="search" size={16} color="#6B7280" />
+          <TextInput
+            ref={inputRef}
+            style={styles.searchInput}
+            placeholder="Search by username..."
+            placeholderTextColor="#9CA3AF"
+            value={query}
+            onChangeText={handleChangeText}
+            autoCapitalize="none"
+            returnKeyType="search"
+            onSubmitEditing={() => onSearch(query.trim())}
+          />
+          {query.length > 0 && (
+            <TouchableOpacity
+              onPress={() => {
+                setQuery("");
+                onSearch("");
+              }}
+            >
+              <Ionicons name="close-circle" size={16} color="#9CA3AF" />
+            </TouchableOpacity>
+          )}
+        </Animated.View>
+      )}
+
+      {/* Right actions */}
+      <View style={styles.rightActions}>
+        <TouchableOpacity
+          style={styles.iconBtn}
+          onPress={searchMode ? closeSearch : openSearch}
+          activeOpacity={0.7}
+        >
+          <Ionicons
+            name={searchMode ? "close" : "search"}
+            size={20}
+            color="#2563EB"
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.logoutButton}
+          onPress={logout}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="log-out-outline" size={20} color="#EF4444" />
+          <Text style={styles.logoutText}>Logout</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -38,7 +133,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderBottomWidth: 1,
     borderBottomColor: "#F3F4F6",
-
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
@@ -57,6 +151,36 @@ const styles = StyleSheet.create({
   },
   brandAccent: {
     color: "#2563EB",
+  },
+  searchBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F3F4F6",
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    gap: 6,
+    flex: 1,
+    marginRight: 10,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 14,
+    color: "#111827",
+    padding: 0,
+  },
+  rightActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  iconBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#EFF6FF",
+    justifyContent: "center",
+    alignItems: "center",
   },
   logoutButton: {
     flexDirection: "row",

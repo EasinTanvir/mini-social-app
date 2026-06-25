@@ -14,6 +14,8 @@ interface GlobalContextType {
   token: string | null;
   login: (user: User, token: string) => Promise<void>;
   logout: () => Promise<void>;
+  usernameFilter: string | undefined;
+  setUsernameFilter: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
 const GlobalContext = createContext<GlobalContextType | undefined>(undefined);
@@ -27,6 +29,7 @@ export const GlobalContextProvider = ({
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [usernameFilter, setUsernameFilter] = useState<string | undefined>();
 
   useEffect(() => {
     restoreSession();
@@ -74,7 +77,16 @@ export const GlobalContextProvider = ({
 
   return (
     <GlobalContext.Provider
-      value={{ loading, isLoggedIn, user, token, login, logout }}
+      value={{
+        loading,
+        isLoggedIn,
+        user,
+        token,
+        login,
+        logout,
+        usernameFilter,
+        setUsernameFilter,
+      }}
     >
       {children}
     </GlobalContext.Provider>

@@ -16,8 +16,12 @@ import CommentSheet from "@/components/CommentSheet";
 
 const PAGE_LIMIT = 10;
 
-const NewsFeed = () => {
-  const { token, usernameFilter } = useGlobalContext();
+interface Props {
+  usernameFilter?: string;
+}
+
+const NewsFeed = ({ usernameFilter }: Props) => {
+  const { token } = useGlobalContext();
 
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);

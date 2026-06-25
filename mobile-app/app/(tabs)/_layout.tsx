@@ -1,14 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
 import { Tabs } from "expo-router";
 import { TabIcon } from "@/components/TabIcon";
-import { BrandHeader } from "@/components/BrandHeader";
+
 import { Platform } from "react-native";
+import { BrandHeader } from "@/components/BrandHeader";
+import { useGlobalContext } from "@/contextApis/GlobalContext";
 
 const TabLayout = () => {
+  const { setUsernameFilter } = useGlobalContext();
+
   return (
     <Tabs
       screenOptions={{
-        header: () => <BrandHeader />,
+        header: () => (
+          <BrandHeader
+            onSearch={(username) => setUsernameFilter(username || undefined)}
+          />
+        ),
         headerShown: true,
 
         tabBarShowLabel: false,
@@ -31,7 +39,7 @@ const TabLayout = () => {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
+          title: "Feed",
           tabBarIcon: ({ focused, color }) => (
             <TabIcon name="home" focused={focused} color={color} label="Home" />
           ),
