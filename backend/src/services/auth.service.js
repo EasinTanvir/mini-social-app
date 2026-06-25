@@ -53,19 +53,13 @@ module.exports = {
     });
 
     if (!user) {
-      throw new HttpError(
-        "Invalid email or password",
-        StatusCodes.UNAUTHORIZED,
-      );
+      throw new HttpError("Invalid Email", StatusCodes.UNAUTHORIZED);
     }
 
     const isPasswordValid = await verifyPassword(password, user.password);
 
     if (!isPasswordValid) {
-      throw new HttpError(
-        "Invalid email or password",
-        StatusCodes.UNAUTHORIZED,
-      );
+      throw new HttpError("Invalid Password", StatusCodes.UNAUTHORIZED);
     }
 
     const token = createJwt(user);
