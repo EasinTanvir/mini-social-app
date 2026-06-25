@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "70852029235",
+    "project_id": "speedy-precinct-465516-g2",
+    "storage_bucket": "speedy-precinct-465516-g2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:70852029235:android:1737997b7e1a8eff1e2c46",
+        "android_client_info": {
+          "package_name": "com.easintanvir.mobileapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "70852029235-v5vb6n78ppoqvsf65ie6p4ekqfk6pbp0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAdiBvGnMdMkpyr4qbM08_4iqrF6kO5zoA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "70852029235-v5vb6n78ppoqvsf65ie6p4ekqfk6pbp0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
