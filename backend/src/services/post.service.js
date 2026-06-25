@@ -26,7 +26,7 @@ module.exports = {
       ? {
           author: {
             username: {
-              equals: username,
+              contains: username,
               mode: "insensitive",
             },
           },
