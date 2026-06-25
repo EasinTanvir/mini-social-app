@@ -18,13 +18,14 @@ module.exports = {
     try {
       const validatedData = createPostSchema.parse(req.body);
 
-      const data = await createPostService(req.user.id, validatedData);
+      const data = await createPostService(req.userId, validatedData);
 
       return res.status(StatusCodes.CREATED).json({
         success: true,
         ...data,
       });
     } catch (error) {
+      console.log("create post error", error);
       return errorHandler(error, req, res, next);
     }
   },

@@ -15,22 +15,12 @@ module.exports = async (req, res, next) => {
     const token = authorization.split(" ")[1];
 
     const decoded = verifyJwt(token);
-
+    console.log({ decoded });
     if (!decoded) {
       throw new HttpError("Invalid or expired token", StatusCodes.UNAUTHORIZED);
     }
 
-    const user = await prismaCli.user.findUnique({
-      where: {
-        id: decoded.id,
-      },
-    });
-
-    if (!user) {
-      throw new HttpError("User not found", StatusCodes.UNAUTHORIZED);
-    }
-
-    req.user = user;
+    req.userId = decoded.id;
 
     next();
   } catch (error) {
