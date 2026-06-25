@@ -16,8 +16,8 @@ import { LinearGradient } from "expo-linear-gradient";
 
 import FormInput from "@/components/FormInput";
 import { loginSchema } from "@/validations/auth.validation";
-import { LoginRequest } from "@/types/auth.types";
-import { loginUser } from "@/services/auth.service";
+import { LoginRequest, LoginResponse } from "@/types/auth.types";
+import api from "@/services/api";
 
 const LoginPage = () => {
   const {
@@ -32,14 +32,15 @@ const LoginPage = () => {
     },
   });
 
-  const onSubmit = async (data: LoginRequest) => {
+  const onSubmit = async (payload: LoginRequest) => {
     try {
-      const res = await loginUser(data);
+      const { data } = await api.post<LoginResponse>("/auth/login", payload);
 
-      Alert.alert("Success", res.message);
-
-      console.log(res);
+      Alert.alert("Success", data.message);
     } catch (error: any) {
+      console.log("Status:", error.response?.status);
+      console.log("Response:", error.response?.data);
+      console.log("Message:", error.response?.data?.message);
       Alert.alert(
         "Error",
         error?.response?.data?.message || "Something went wrong",

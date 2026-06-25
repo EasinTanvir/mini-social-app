@@ -13,12 +13,7 @@ const app = express();
 
 app.use(helmet());
 
-app.use(
-  cors({
-    origin: [FRONTEND_ORIGIN],
-    credentials: true,
-  }),
-);
+app.use(cors());
 
 app.use(compression());
 app.use(express.json());
