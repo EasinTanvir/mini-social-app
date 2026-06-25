@@ -23,7 +23,7 @@ app.use(compression());
 app.use(express.json());
 app.use(morgan("dev"));
 
-app.use(`api/v1/auth`, authRoute);
+app.use(`/api/v1/auth`, authRoute);
 
 // error middleware
 app.use(invalidRoutes);
