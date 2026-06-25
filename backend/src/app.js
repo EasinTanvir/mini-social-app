@@ -6,6 +6,7 @@ const compression = require("compression");
 
 const { FRONTEND_ORIGIN } = require("../config");
 const { invalidRoutes, errorMethod } = require("./utils/errorHandler");
+const authRoute = require("./routes/auth.route");
 
 const app = express();
 
@@ -22,12 +23,7 @@ app.use(compression());
 app.use(express.json());
 app.use(morgan("dev"));
 
-app.get("/", (req, res) => {
-  res.json({
-    success: true,
-    message: "Mini Social Feed API",
-  });
-});
+app.use(`api/v1/auth`, authRoute);
 
 // error middleware
 app.use(invalidRoutes);
