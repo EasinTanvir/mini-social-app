@@ -12,7 +12,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LinearGradient } from "expo-linear-gradient";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 
 import FormInput from "@/components/FormInput";
 import { registerSchema } from "@/validations/auth.validation";
@@ -34,6 +34,8 @@ const RegisterPage = () => {
     },
   });
 
+  const router = useRouter();
+
   const onSubmit = async (data: RegisterRequest) => {
     try {
       const res = await registerUser(data);
@@ -41,6 +43,7 @@ const RegisterPage = () => {
       Alert.alert("Success", res.message);
 
       reset();
+      router.replace("/login");
     } catch (error: any) {
       Alert.alert(
         "Error",

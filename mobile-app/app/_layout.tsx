@@ -4,28 +4,43 @@ import {
 } from "@/contextApis/GlobalContext";
 import { Stack } from "expo-router";
 import React from "react";
+import { ActivityIndicator, View } from "react-native";
 
 const LayoutWrapper = () => {
-  const { isLoggedIn } = useGlobalContext();
+  const { isLoggedIn, loading } = useGlobalContext();
+
+  if (loading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
   return (
-    <Stack>
+    <Stack screenOptions={{ headerShown: false }}>
       <Stack.Protected guard={isLoggedIn}>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" />
       </Stack.Protected>
 
       <Stack.Protected guard={!isLoggedIn}>
-        <Stack.Screen name="login" options={{ headerShown: false }} />
-        <Stack.Screen name="register" options={{ headerShown: false }} />
+        <Stack.Screen name="login" />
+        <Stack.Screen name="register" />
       </Stack.Protected>
     </Stack>
   );
 };
 
-const RootLayout = () => {
+export default function RootLayout() {
   return (
     <GlobalContextProvider>
       <LayoutWrapper />
     </GlobalContextProvider>
   );
-};
-export default RootLayout;
+}
