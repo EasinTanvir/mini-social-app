@@ -35,7 +35,7 @@ const CreatePost = () => {
   });
 
   const text = watch("text");
-  const { token } = useGlobalContext();
+  const { token, triggerFeedRefresh } = useGlobalContext();
   const router = useRouter();
 
   const onSubmit = async (payload: CreatePostRequest) => {
@@ -51,6 +51,7 @@ const CreatePost = () => {
       Alert.alert("Success", data.message);
 
       reset();
+      triggerFeedRefresh();
       router.push("/(tabs)");
     } catch (error: any) {
       Alert.alert(

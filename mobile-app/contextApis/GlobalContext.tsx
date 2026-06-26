@@ -4,6 +4,7 @@ import React, {
   useState,
   useEffect,
   useRef,
+  useCallback,
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Notifications from "expo-notifications";
@@ -24,6 +25,9 @@ interface GlobalContextType {
   logout: () => Promise<void>;
   usernameFilter: string | undefined;
   setUsernameFilter: React.Dispatch<React.SetStateAction<string | undefined>>;
+  feedRefreshKey: number;
+  setFeedRefreshKey: React.Dispatch<React.SetStateAction<number>>;
+  triggerFeedRefresh: () => void;
 }
 
 const GlobalContext = createContext<GlobalContextType | undefined>(undefined);
@@ -42,7 +46,8 @@ export const GlobalContextProvider = ({
   const notificationListener = useRef<Notifications.Subscription | null>(null);
   const responseListener = useRef<Notifications.Subscription | null>(null);
 
-  // ─── Restore session on mount ─────────────────────────────────────────────
+  const [feedRefreshKey, setFeedRefreshKey] = useState(0);
+
   useEffect(() => {
     restoreSession();
   }, []);
@@ -63,7 +68,6 @@ export const GlobalContextProvider = ({
     }
   };
 
-  // ─── Auth ─────────────────────────────────────────────────────────────────
   const login = async (newUser: User, newToken: string) => {
     try {
       await AsyncStorage.setItem("user", JSON.stringify(newUser));
@@ -114,6 +118,10 @@ export const GlobalContextProvider = ({
     };
   }, []);
 
+  const triggerFeedRefresh = useCallback(() => {
+    setFeedRefreshKey((k) => k + 1);
+  }, []);
+
   return (
     <GlobalContext.Provider
       value={{
@@ -125,6 +133,9 @@ export const GlobalContextProvider = ({
         logout,
         usernameFilter,
         setUsernameFilter,
+        feedRefreshKey,
+        setFeedRefreshKey,
+        triggerFeedRefresh,
       }}
     >
       {children}

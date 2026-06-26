@@ -18,7 +18,7 @@ import CommentSheet from "@/components/CommentSheet";
 const PAGE_LIMIT = 10;
 
 const NewsFeed = () => {
-  const { token, usernameFilter } = useGlobalContext();
+  const { token, usernameFilter, feedRefreshKey } = useGlobalContext();
   const { width } = useWindowDimensions();
   const isTablet = width >= 768;
 
@@ -59,7 +59,7 @@ const NewsFeed = () => {
     setPage(1);
     setHasNextPage(true);
     fetchPosts(1, true, usernameFilter);
-  }, [usernameFilter, fetchPosts]);
+  }, [usernameFilter, fetchPosts, feedRefreshKey]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);

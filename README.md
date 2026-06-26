@@ -186,3 +186,5 @@ eas build --platform android --profile preview
 - Triggered when someone **likes** your post → "New Like ❤️"
 - Triggered when someone **comments** on your post → "New Comment 💬"
 - You do **not** get notified for your own actions
+
+eas build --platform android --profile preview
