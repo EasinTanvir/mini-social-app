@@ -72,4 +72,15 @@ module.exports = {
       user: safeUser,
     };
   },
+
+  saveFcmTokenService: async (userId, fcmToken) => {
+    if (!fcmToken) {
+      throw new HttpError("fcmToken required", StatusCodes.BAD_REQUEST);
+    }
+
+    await prismaCli.user.update({
+      where: { id: userId },
+      data: { fcmToken },
+    });
+  },
 };

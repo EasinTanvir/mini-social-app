@@ -1,6 +1,10 @@
 const { StatusCodes } = require("http-status-codes");
 
-const { registerService, loginService } = require("../services/auth.service");
+const {
+  registerService,
+  loginService,
+  saveFcmTokenService,
+} = require("../services/auth.service");
 const {
   registerSchema,
   loginSchema,
@@ -32,6 +36,21 @@ module.exports = {
       return res.status(StatusCodes.OK).json({
         success: true,
         ...data,
+      });
+    } catch (error) {
+      return errorHandler(error, req, res, next);
+    }
+  },
+
+  saveFcmTokenController: async (req, res, next) => {
+    try {
+      const { fcmToken } = req.body;
+
+      await saveFcmTokenService(req.userId, fcmToken);
+
+      return res.json({
+        success: true,
+        message: "FCM token updated",
       });
     } catch (error) {
       return errorHandler(error, req, res, next);
