@@ -1,5 +1,5 @@
 const { initializeApp, getApps, cert } = require("firebase-admin/app");
-const { messaging } = require("firebase-admin");
+const { getMessaging } = require("firebase-admin/messaging");
 const {
   FIREBASE_PROJECT_ID,
   FIREBASE_CLIENT_EMAIL,
@@ -32,7 +32,7 @@ const sendFCMNotification = async (fcmToken, { title, body, data = {} }) => {
       Object.entries(data).map(([k, v]) => [k, String(v)]),
     );
 
-    await messaging().send({
+    await getMessaging().send({
       token: fcmToken,
       notification: { title, body },
       data: stringifiedData,
