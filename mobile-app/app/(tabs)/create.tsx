@@ -13,9 +13,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useForm } from "react-hook-form";
 
 import FormInput from "@/components/FormInput";
-import api from "@/services/api";
 import { useRouter } from "expo-router";
 import { useGlobalContext } from "@/contextApis/GlobalContext";
+import { createPost } from "@/services/post.service";
 
 type CreatePostRequest = {
   text: string;
@@ -40,14 +40,8 @@ const CreatePost = () => {
 
   const onSubmit = async (payload: CreatePostRequest) => {
     try {
-      const { data } = await api.post("/post", payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
+      const data = await createPost(token!, payload.text);
       Alert.alert("Success", data.message);
-
       reset();
       triggerFeedRefresh();
       router.push("/(tabs)");
@@ -58,7 +52,6 @@ const CreatePost = () => {
       );
     }
   };
-
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView

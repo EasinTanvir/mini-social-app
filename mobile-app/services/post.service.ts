@@ -24,6 +24,18 @@ export const getPosts = async (
   return data;
 };
 
+export const createPost = async (
+  token: string,
+  text: string,
+): Promise<{ message: string }> => {
+  const { data } = await api.post<{ message: string }>(
+    "/post",
+    { text },
+    authHeader(token),
+  );
+  return data;
+};
+
 export const likePost = async (token: string, postId: string) => {
   const { data } = await api.post(
     `/post/${postId}/like`,
