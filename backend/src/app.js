@@ -22,7 +22,6 @@ app.use(morgan("dev"));
 app.use(`/api/v1/auth`, authRoute);
 app.use(`/api/v1/post`, postRoute);
 
-// error middleware
 app.use(invalidRoutes);
 app.use(errorMethod);
 
