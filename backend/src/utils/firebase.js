@@ -1,21 +1,24 @@
-// In v14, everything for initialization is cleanly imported from 'firebase-admin/app'
 const { initializeApp, getApps, cert } = require("firebase-admin/app");
 const { messaging } = require("firebase-admin");
 
-let serviceAccount;
-try {
-  serviceAccount = require("../../firebase-service-account.json");
-} catch (e) {
-  console.error("firebase-service-account.json not found:", e.message);
-  process.exit(1);
-}
-
-// Check initialized state using standard getApps()
 const apps = getApps();
 if (!apps || !apps.length) {
+  const { FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY } =
+    process.env;
+
+  if (!FIREBASE_PROJECT_ID || !FIREBASE_CLIENT_EMAIL || !FIREBASE_PRIVATE_KEY) {
+    console.error(
+      "Missing Firebase env variables: FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY",
+    );
+    process.exit(1);
+  }
+
   initializeApp({
-    // Fix: Pass your service account directly into the standalone cert() function
-    credential: cert(serviceAccount),
+    credential: cert({
+      projectId: FIREBASE_PROJECT_ID,
+      clientEmail: FIREBASE_CLIENT_EMAIL,
+      privateKey: FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+    }),
   });
 }
 
@@ -23,10 +26,14 @@ const sendFCMNotification = async (fcmToken, { title, body, data = {} }) => {
   if (!fcmToken) return;
 
   try {
+    const stringifiedData = Object.fromEntries(
+      Object.entries(data).map(([k, v]) => [k, String(v)]),
+    );
+
     await messaging().send({
       token: fcmToken,
       notification: { title, body },
-      data,
+      data: stringifiedData,
       android: {
         priority: "high",
         notification: {
