@@ -16,7 +16,6 @@ Create a `.env` file inside the `backend/` folder and fill in your values:
 
 ```env
 PORT=
-FRONTEND_ORIGIN=
 TOKEN_KEY=
 DATABASE_URL=
 FIREBASE_PROJECT_ID=
