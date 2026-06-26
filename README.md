@@ -8,18 +8,9 @@
 └── README.md
 ```
 
----
-
 ## Backend Setup
 
-### Step 1 — Install dependencies
-
-```bash
-cd backend
-npm install
-```
-
-### Step 2 — Create environment file
+### Step 1 — Create environment file
 
 Create a `.env` file inside the `backend/` folder and fill in your values:
 
@@ -33,13 +24,12 @@ FIREBASE_CLIENT_EMAIL=
 FIREBASE_PRIVATE_KEY=
 ```
 
-To get the Firebase values, go to Firebase Console → Project Settings → Service Accounts → Generate new private key. Open the downloaded JSON and copy:
+### Step 2 — Install dependencies
 
-| Env Variable            | Key in JSON                     |
-| ----------------------- | ------------------------------- |
-| `FIREBASE_PROJECT_ID`   | `project_id`                    |
-| `FIREBASE_CLIENT_EMAIL` | `client_email`                  |
-| `FIREBASE_PRIVATE_KEY`  | `private_key` (keep the quotes) |
+```bash
+cd backend
+npm install
+```
 
 ### Step 3 — Start the server
 
