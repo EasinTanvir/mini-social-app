@@ -40,8 +40,6 @@ const CreatePost = () => {
 
   const onSubmit = async (payload: CreatePostRequest) => {
     try {
-      console.log({ token });
-      console.log({ token });
       const { data } = await api.post("/post", payload, {
         headers: {
           Authorization: `Bearer ${token}`,

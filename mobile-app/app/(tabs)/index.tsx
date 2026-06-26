@@ -15,7 +15,7 @@ import { Comment, Post } from "@/types/post.types";
 import { useGlobalContext } from "@/contextApis/GlobalContext";
 import CommentSheet from "@/components/CommentSheet";
 
-const PAGE_LIMIT = 10;
+const PAGE_LIMIT = 5;
 
 const NewsFeed = () => {
   const { token, usernameFilter, feedRefreshKey } = useGlobalContext();
