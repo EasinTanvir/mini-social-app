@@ -20,7 +20,7 @@ module.exports = {
 
   getPostsService: async (userId, page, limit, username) => {
     const safePage = Math.max(1, parseInt(page) || 1);
-    const safeLimit = Math.max(1, Math.min(50, parseInt(limit) || 10));
+    const safeLimit = Math.max(1, Math.min(50, parseInt(limit) || 5));
     const skip = (safePage - 1) * safeLimit;
 
     const where = username

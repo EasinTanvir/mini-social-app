@@ -33,7 +33,7 @@ module.exports = {
   getPostsController: async (req, res, next) => {
     try {
       const page = Math.max(1, parseInt(req.query.page) || 1);
-      const limit = Math.max(1, Math.min(50, parseInt(req.query.limit) || 10));
+      const limit = Math.max(1, Math.min(50, parseInt(req.query.limit) || 5));
       const username = req.query.username?.trim() || undefined;
 
       const data = await getPostsService(req.userId, page, limit, username);

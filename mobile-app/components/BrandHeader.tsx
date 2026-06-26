@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useCallback } from "react";
 import {
   Animated,
   StyleSheet,
@@ -12,7 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useGlobalContext } from "@/contextApis/GlobalContext";
 
 interface Props {
-  onSearch: (username: string) => void;
+  onSearch?: (username: string) => void;
 }
 
 export const BrandHeader = ({ onSearch }: Props) => {
@@ -23,8 +23,10 @@ export const BrandHeader = ({ onSearch }: Props) => {
   const [query, setQuery] = useState("");
   const inputRef = useRef<TextInput>(null);
   const widthAnim = useRef(new Animated.Value(0)).current;
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const openSearch = () => {
+    if (!onSearch) return;
     setSearchMode(true);
     Animated.spring(widthAnim, {
       toValue: 1,
@@ -33,24 +35,35 @@ export const BrandHeader = ({ onSearch }: Props) => {
     }).start(() => inputRef.current?.focus());
   };
 
-  const closeSearch = () => {
+  const closeSearch = useCallback(() => {
     setQuery("");
-    onSearch("");
+    onSearch?.("");
     setSearchMode(false);
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
     Animated.timing(widthAnim, {
       toValue: 0,
       duration: 200,
       useNativeDriver: false,
     }).start();
-  };
+  }, [onSearch]);
 
-  const handleChangeText = (text: string) => {
-    setQuery(text);
-    // debounce: fire after user pauses 400ms
-    if (handleChangeText._timer) clearTimeout(handleChangeText._timer);
-    handleChangeText._timer = setTimeout(() => onSearch(text.trim()), 400);
-  };
-  handleChangeText._timer = null as any;
+  const handleChangeText = useCallback(
+    (text: string) => {
+      setQuery(text);
+
+      if (debounceTimer.current) clearTimeout(debounceTimer.current);
+      debounceTimer.current = setTimeout(() => {
+        onSearch?.(text.trim());
+      }, 400);
+    },
+    [onSearch],
+  );
+
+  const clearQuery = useCallback(() => {
+    setQuery("");
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    onSearch?.("");
+  }, [onSearch]);
 
   const animatedWidth = widthAnim.interpolate({
     inputRange: [0, 1],
@@ -59,7 +72,6 @@ export const BrandHeader = ({ onSearch }: Props) => {
 
   return (
     <View style={[styles.headerContainer, { paddingTop: insets.top + 10 }]}>
-      {/* Brand — hidden when search is open */}
       {!searchMode && (
         <View style={styles.brandWrapper}>
           <Text style={styles.brandText}>
@@ -68,7 +80,6 @@ export const BrandHeader = ({ onSearch }: Props) => {
         </View>
       )}
 
-      {/* Animated search bar */}
       {searchMode && (
         <Animated.View style={[styles.searchBar, { width: animatedWidth }]}>
           <Ionicons name="search" size={16} color="#6B7280" />
@@ -81,34 +92,33 @@ export const BrandHeader = ({ onSearch }: Props) => {
             onChangeText={handleChangeText}
             autoCapitalize="none"
             returnKeyType="search"
-            onSubmitEditing={() => onSearch(query.trim())}
+            onSubmitEditing={() => {
+              if (debounceTimer.current) clearTimeout(debounceTimer.current);
+              onSearch?.(query.trim());
+            }}
           />
           {query.length > 0 && (
-            <TouchableOpacity
-              onPress={() => {
-                setQuery("");
-                onSearch("");
-              }}
-            >
+            <TouchableOpacity onPress={clearQuery}>
               <Ionicons name="close-circle" size={16} color="#9CA3AF" />
             </TouchableOpacity>
           )}
         </Animated.View>
       )}
 
-      {/* Right actions */}
       <View style={styles.rightActions}>
-        <TouchableOpacity
-          style={styles.iconBtn}
-          onPress={searchMode ? closeSearch : openSearch}
-          activeOpacity={0.7}
-        >
-          <Ionicons
-            name={searchMode ? "close" : "search"}
-            size={20}
-            color="#2563EB"
-          />
-        </TouchableOpacity>
+        {onSearch && (
+          <TouchableOpacity
+            style={styles.iconBtn}
+            onPress={searchMode ? closeSearch : openSearch}
+            activeOpacity={0.7}
+          >
+            <Ionicons
+              name={searchMode ? "close" : "search"}
+              size={20}
+              color="#2563EB"
+            />
+          </TouchableOpacity>
+        )}
 
         <TouchableOpacity
           style={styles.logoutButton}
