@@ -1,7 +1,6 @@
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
-import Constants from "expo-constants";
 import api from "@/services/api";
 
 Notifications.setNotificationHandler({
@@ -47,14 +46,8 @@ const registerForPushNotifications = async (
     });
   }
 
-  const projectId =
-    Constants.expoConfig?.extra?.eas?.projectId ?? "speedy-precinct-465516-g2";
-
-  const expoPushToken = await Notifications.getExpoPushTokenAsync({
-    projectId,
-  });
-
-  const fcmToken = expoPushToken.data;
+  const devicePushToken = await Notifications.getDevicePushTokenAsync();
+  const fcmToken = devicePushToken.data;
 
   try {
     await api.post(
