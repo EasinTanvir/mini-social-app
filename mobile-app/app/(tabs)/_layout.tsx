@@ -1,13 +1,21 @@
-import React, { useState } from "react";
+import React from "react";
 import { Tabs } from "expo-router";
 import { TabIcon } from "@/components/TabIcon";
-
 import { Platform } from "react-native";
+
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BrandHeader } from "@/components/BrandHeader";
 import { useGlobalContext } from "@/contextApis/GlobalContext";
 
 const TabLayout = () => {
   const { setUsernameFilter } = useGlobalContext();
+
+  const insets = useSafeAreaInsets();
+
+  const isIOS = Platform.OS === "ios";
+
+  const bottomPadding = insets.bottom > 0 ? insets.bottom : isIOS ? 20 : 10;
+  const tabBarHeight = (isIOS ? 50 : 54) + bottomPadding;
 
   return (
     <Tabs
@@ -26,8 +34,9 @@ const TabLayout = () => {
           backgroundColor: "#FFFFFF",
           borderTopWidth: 1,
           borderTopColor: "#E5E7EB",
-          height: Platform.OS === "ios" ? 88 : 64,
-          paddingBottom: Platform.OS === "ios" ? 30 : 10,
+          height: tabBarHeight,
+          paddingBottom: bottomPadding,
+          paddingTop: isIOS ? 5 : 10,
           shadowColor: "#000",
           shadowOffset: { width: 0, height: -4 },
           shadowOpacity: 0.04,
