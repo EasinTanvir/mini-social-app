@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import {
   Alert,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -33,6 +34,7 @@ const CreatePost = () => {
       text: "",
     },
   });
+  const scrollRef = useRef<ScrollView>(null);
 
   const text = watch("text");
   const { token, triggerFeedRefresh } = useGlobalContext();
@@ -52,14 +54,25 @@ const CreatePost = () => {
       );
     }
   };
+
+  useEffect(() => {
+    const showListener = Keyboard.addListener("keyboardDidShow", () => {
+      setTimeout(() => {
+        scrollRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    });
+
+    return () => showListener.remove();
+  }, []);
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
         style={styles.keyboardContainer}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
       >
         <ScrollView
+          ref={scrollRef}
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={styles.content}
         >
