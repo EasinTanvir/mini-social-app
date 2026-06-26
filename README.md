@@ -1,8 +1,4 @@
-# Mini Social Feed App
-
-A lightweight social media app built with Node.js + Express (backend) and React Native + Expo (mobile).
-
-## 📦 Project Structure
+## Project Structure
 
 ```
 ├── backend/        # Node.js + Express + MongoDB + Firebase Admin
@@ -10,16 +6,12 @@ A lightweight social media app built with Node.js + Express (backend) and React 
 └── README.md
 ```
 
----
-
-## 🔗 Links
+## Links
 
 - **APK Download:** https://expo.dev/accounts/easin/projects/mobile-app/builds/f7ecf21b-f38f-4760-99fa-b6c5cd8e2f0c
-- **GitHub:** _repo link here_
+- **GitHub:** https://github.com/EasinTanvir/mini-social-app
 
----
-
-## ⚙️ Backend Setup
+## Backend Setup
 
 ### Requirements
 
@@ -64,7 +56,7 @@ All endpoints except signup/login require: `Authorization: Bearer <token>`
 
 ---
 
-## 📱 Mobile App Setup
+## Mobile App Setup
 
 ### Requirements
 
@@ -90,10 +82,10 @@ npx expo start
 
 ---
 
-## 🔔 Push Notifications
+## Push Notifications
 
 Notifications are sent via Firebase Cloud Messaging when someone likes or comments on your post.
 
-- `firebase-service-account.json` must be present in `backend/` (not committed to Git)
-- `google-services.json` must be present in `mobile-app/` (not committed to Git)
+- `firebase-service-account.json` file must be present in `backend/` (not committed to Git)
+- `google-services.json` file must be present in `mobile-app/` (not committed to Git)
 - The APK above already has FCM integrated and ready to use
