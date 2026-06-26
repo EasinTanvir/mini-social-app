@@ -73,6 +73,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F9FAFB",
+    maxWidth: 680,
+    alignSelf: "center",
+    width: "100%",
   },
   header: {
     flexDirection: "row",
