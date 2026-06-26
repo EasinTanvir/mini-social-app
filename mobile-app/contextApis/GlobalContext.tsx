@@ -87,29 +87,23 @@ export const GlobalContextProvider = ({
     }
   };
 
-  // ─── Register FCM token when logged in ───────────────────────────────────
   useEffect(() => {
     if (token) {
       registerForPushNotifications(token);
     }
   }, [token]);
 
-  // ─── Notification listeners ───────────────────────────────────────────────
   useEffect(() => {
-    // Fires when a notification is received while app is foregrounded
     notificationListener.current =
       Notifications.addNotificationReceivedListener((notification) => {
         console.log("Notification received:", notification.request.content);
       });
 
-    // Fires when user taps a notification
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
         const data = response.notification.request.content.data;
         const postId = data?.postId as string | undefined;
         if (postId) {
-          // Uncomment when you have navigation set up:
-          // router.push(`/post/${postId}`);
           console.log("User tapped notification for postId:", postId);
         }
       });

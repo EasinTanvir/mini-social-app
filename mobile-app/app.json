@@ -57,8 +57,10 @@
     },
     "extra": {
       "eas": {
-        "projectId": "speedy-precinct-465516-g2"
-      }
-    }
+        "projectId": "cd7ad191-51cb-4edb-8bb6-9d7dc5718365"
+      },
+      "router": {}
+    },
+    "owner": "easin"
   }
 }
