@@ -65,7 +65,6 @@ const CreatePost = () => {
       <KeyboardAvoidingView
         style={styles.keyboardContainer}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        // Gives extra lift space for the keyboard inside a bottom modal overlay
         keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
       >
         <ScrollView
