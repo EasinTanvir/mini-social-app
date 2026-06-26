@@ -9,6 +9,7 @@ import React, {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Notifications from "expo-notifications";
 import registerForPushNotifications from "../utils/notifications";
+import { Alert } from "react-native";
 
 interface User {
   id: string;
@@ -97,10 +98,19 @@ export const GlobalContextProvider = ({
     }
   }, [token]);
 
+  const triggerFeedRefresh = useCallback(() => {
+    setFeedRefreshKey((k) => k + 1);
+  }, []);
+
   useEffect(() => {
     notificationListener.current =
       Notifications.addNotificationReceivedListener((notification) => {
+        const { title, body } = notification.request.content;
         console.log("Notification received:", notification.request.content);
+
+        Alert.alert(title ?? "New Notification", body ?? "");
+
+        triggerFeedRefresh();
       });
 
     responseListener.current =
@@ -109,6 +119,8 @@ export const GlobalContextProvider = ({
         const postId = data?.postId as string | undefined;
         if (postId) {
           console.log("User tapped notification for postId:", postId);
+
+          triggerFeedRefresh();
         }
       });
 
@@ -116,11 +128,7 @@ export const GlobalContextProvider = ({
       notificationListener.current?.remove();
       responseListener.current?.remove();
     };
-  }, []);
-
-  const triggerFeedRefresh = useCallback(() => {
-    setFeedRefreshKey((k) => k + 1);
-  }, []);
+  }, [triggerFeedRefresh]);
 
   return (
     <GlobalContext.Provider
