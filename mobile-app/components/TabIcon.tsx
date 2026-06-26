@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
   container: {
     alignItems: "center",
     justifyContent: "center",
-    width: 60,
+    width: 70,
     top: Platform.OS === "ios" ? 10 : 0, // Padding adjustments for iOS bottom notch
   },
   label: {

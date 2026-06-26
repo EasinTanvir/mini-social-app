@@ -8,13 +8,21 @@ import React, {
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Notifications from "expo-notifications";
-import registerForPushNotifications from "../utils/notifications";
 import { Alert } from "react-native";
+import registerForPushNotifications from "../utils/notifications";
 
 interface User {
   id: string;
   username: string;
   email: string;
+}
+
+export interface AppNotification {
+  id: string;
+  title: string;
+  body: string;
+  type: "like" | "comment" | "other";
+  receivedAt: number;
 }
 
 interface GlobalContextType {
@@ -26,8 +34,10 @@ interface GlobalContextType {
   logout: () => Promise<void>;
   usernameFilter: string | undefined;
   setUsernameFilter: React.Dispatch<React.SetStateAction<string | undefined>>;
+  notifications: AppNotification[];
+  unreadCount: number;
+  clearNotifications: () => void;
   feedRefreshKey: number;
-  setFeedRefreshKey: React.Dispatch<React.SetStateAction<number>>;
   triggerFeedRefresh: () => void;
 }
 
@@ -43,11 +53,39 @@ export const GlobalContextProvider = ({
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [usernameFilter, setUsernameFilter] = useState<string | undefined>();
+  const [notifications, setNotifications] = useState<AppNotification[]>([]);
+  const [feedRefreshKey, setFeedRefreshKey] = useState(0);
 
   const notificationListener = useRef<Notifications.Subscription | null>(null);
   const responseListener = useRef<Notifications.Subscription | null>(null);
 
-  const [feedRefreshKey, setFeedRefreshKey] = useState(0);
+  const unreadCount = notifications.length;
+
+  const clearNotifications = useCallback(() => {
+    setNotifications([]);
+  }, []);
+
+  const triggerFeedRefresh = useCallback(() => {
+    setFeedRefreshKey((k) => k + 1);
+  }, []);
+
+  const addNotification = useCallback((title: string, body: string) => {
+    const type = title.toLowerCase().includes("like")
+      ? "like"
+      : title.toLowerCase().includes("comment")
+        ? "comment"
+        : "other";
+
+    const newNotif: AppNotification = {
+      id: Date.now().toString(),
+      title,
+      body,
+      type,
+      receivedAt: Date.now(),
+    };
+
+    setNotifications((prev) => [newNotif, ...prev]);
+  }, []);
 
   useEffect(() => {
     restoreSession();
@@ -87,6 +125,7 @@ export const GlobalContextProvider = ({
       setUser(null);
       setToken(null);
       setIsLoggedIn(false);
+      setNotifications([]);
     } catch (e) {
       console.error("Failed to clear login session", e);
     }
@@ -98,18 +137,15 @@ export const GlobalContextProvider = ({
     }
   }, [token]);
 
-  const triggerFeedRefresh = useCallback(() => {
-    setFeedRefreshKey((k) => k + 1);
-  }, []);
-
   useEffect(() => {
     notificationListener.current =
       Notifications.addNotificationReceivedListener((notification) => {
         const { title, body } = notification.request.content;
-        console.log("Notification received:", notification.request.content);
+        const t = title ?? "New Notification";
+        const b = body ?? "";
 
-        Alert.alert(title ?? "New Notification", body ?? "");
-
+        addNotification(t, b);
+        Alert.alert(t, b);
         triggerFeedRefresh();
       });
 
@@ -119,7 +155,6 @@ export const GlobalContextProvider = ({
         const postId = data?.postId as string | undefined;
         if (postId) {
           console.log("User tapped notification for postId:", postId);
-
           triggerFeedRefresh();
         }
       });
@@ -128,7 +163,7 @@ export const GlobalContextProvider = ({
       notificationListener.current?.remove();
       responseListener.current?.remove();
     };
-  }, [triggerFeedRefresh]);
+  }, [addNotification, triggerFeedRefresh]);
 
   return (
     <GlobalContext.Provider
@@ -141,8 +176,10 @@ export const GlobalContextProvider = ({
         logout,
         usernameFilter,
         setUsernameFilter,
+        notifications,
+        unreadCount,
+        clearNotifications,
         feedRefreshKey,
-        setFeedRefreshKey,
         triggerFeedRefresh,
       }}
     >

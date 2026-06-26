@@ -8,7 +8,7 @@ import { BrandHeader } from "@/components/BrandHeader";
 import { useGlobalContext } from "@/contextApis/GlobalContext";
 
 const TabLayout = () => {
-  const { setUsernameFilter } = useGlobalContext();
+  const { setUsernameFilter, unreadCount } = useGlobalContext();
 
   const insets = useSafeAreaInsets();
 
@@ -65,6 +65,21 @@ const TabLayout = () => {
               focused={focused}
               color={color}
               label="Create"
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="notification"
+        options={{
+          tabBarBadge: unreadCount,
+          title: "notification",
+          tabBarIcon: ({ focused, color }) => (
+            <TabIcon
+              name="notifications"
+              focused={focused}
+              color={color}
+              label="notification"
             />
           ),
         }}
