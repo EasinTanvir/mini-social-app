@@ -41,13 +41,7 @@ To get the Firebase values, go to Firebase Console → Project Settings → Serv
 | `FIREBASE_CLIENT_EMAIL` | `client_email`                  |
 | `FIREBASE_PRIVATE_KEY`  | `private_key` (keep the quotes) |
 
-### Step 3 — Generate Prisma client
-
-```bash
-npx prisma generate
-```
-
-### Step 4 — Start the server
+### Step 3 — Start the server
 
 ```bash
 npm start
