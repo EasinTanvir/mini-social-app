@@ -85,3 +85,5 @@ Then start:
 ```bash
 npx expo start
 ```
+
+> **Note for rebuilding:** If you want to build the APK from source, place a `google-services.json` file in the `mobile-app/` root directory. The file must be registered with Android package name `com.easintanvir.mobileapp` (Firebase Console → Project Settings → General → Add Android app).
