@@ -2,20 +2,18 @@ import React from "react";
 import { Tabs } from "expo-router";
 import { TabIcon } from "@/components/TabIcon";
 import { Platform } from "react-native";
-
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BrandHeader } from "@/components/BrandHeader";
 import { useGlobalContext } from "@/contextApis/GlobalContext";
 
 const TabLayout = () => {
   const { setUsernameFilter, unreadCount } = useGlobalContext();
-
   const insets = useSafeAreaInsets();
 
-  const isIOS = Platform.OS === "ios";
+  const TAB_BAR_CONTENT_HEIGHT = Platform.OS === "ios" ? 50 : 65;
 
-  const bottomPadding = insets.bottom > 0 ? insets.bottom : isIOS ? 20 : 10;
-  const tabBarHeight = (isIOS ? 50 : 54) + bottomPadding;
+  const bottomInset =
+    Platform.OS === "android" ? Math.max(insets.bottom, 16) : insets.bottom;
 
   return (
     <Tabs
@@ -26,7 +24,6 @@ const TabLayout = () => {
           />
         ),
         headerShown: true,
-
         tabBarShowLabel: false,
         tabBarActiveTintColor: "#2563EB",
         tabBarInactiveTintColor: "#9CA3AF",
@@ -34,9 +31,12 @@ const TabLayout = () => {
           backgroundColor: "#FFFFFF",
           borderTopWidth: 1,
           borderTopColor: "#E5E7EB",
-          height: tabBarHeight,
-          paddingBottom: bottomPadding,
-          paddingTop: isIOS ? 5 : 10,
+
+          height: TAB_BAR_CONTENT_HEIGHT + bottomInset,
+
+          paddingBottom: bottomInset,
+          paddingTop: Platform.OS === "ios" ? 5 : 15,
+
           shadowColor: "#000",
           shadowOffset: { width: 0, height: -4 },
           shadowOpacity: 0.04,
@@ -54,7 +54,6 @@ const TabLayout = () => {
           ),
         }}
       />
-
       <Tabs.Screen
         name="create"
         options={{

@@ -68,8 +68,8 @@ const CreatePost = () => {
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
         style={styles.keyboardContainer}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
+        behavior="padding"
+        keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 100}
       >
         <ScrollView
           ref={scrollRef}

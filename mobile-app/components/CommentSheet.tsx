@@ -5,7 +5,7 @@ import {
   Dimensions,
   FlatList,
   Keyboard,
-  KeyboardEvent,
+  KeyboardAvoidingView,
   Modal,
   Platform,
   Pressable,
@@ -15,6 +15,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Comment } from "@/types/post.types";
 import { commentOnPost } from "@/services/post.service";
 import { useGlobalContext } from "@/contextApis/GlobalContext";
@@ -38,9 +39,9 @@ const CommentSheet = ({
   onCommentAdded,
 }: Props) => {
   const { token } = useGlobalContext();
+  const insets = useSafeAreaInsets();
   const [text, setText] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
   const listRef = useRef<FlatList>(null);
 
@@ -61,29 +62,14 @@ const CommentSheet = ({
     }
   }, [visible]);
 
-  // ─── Keyboard listeners ───────────────────────────────────────────────────
+  // ─── Scroll to end when keyboard opens ───────────────────────────────────
   useEffect(() => {
-    const showListener = Keyboard.addListener(
-      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
-      (e: KeyboardEvent) => {
-        setKeyboardHeight(e.endCoordinates.height);
-        setTimeout(() => {
-          listRef.current?.scrollToEnd({ animated: true });
-        }, 100);
-      },
-    );
-
-    const hideListener = Keyboard.addListener(
-      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
-      () => {
-        setKeyboardHeight(0);
-      },
-    );
-
-    return () => {
-      showListener.remove();
-      hideListener.remove();
-    };
+    const event =
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const sub = Keyboard.addListener(event, () => {
+      setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 100);
+    });
+    return () => sub.remove();
   }, []);
 
   const handleSubmit = async () => {
@@ -93,9 +79,7 @@ const CommentSheet = ({
       const res = await commentOnPost(token!, postId, text.trim());
       onCommentAdded(postId, res.comment);
       setText("");
-      setTimeout(() => {
-        listRef.current?.scrollToEnd({ animated: true });
-      }, 100);
+      setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 100);
     } catch (e) {
       console.log("Comment error:", e);
     } finally {
@@ -111,81 +95,97 @@ const CommentSheet = ({
       onRequestClose={onClose}
       statusBarTranslucent
     >
-      <Pressable
-        style={styles.backdrop}
-        onPress={() => {
-          Keyboard.dismiss();
-          onClose();
-        }}
-      />
-
-      {/* bottom shifts up exactly by keyboard height */}
-      <Animated.View
-        style={[
-          styles.sheet,
-          {
-            transform: [{ translateY: slideAnim }],
-            bottom: keyboardHeight,
-          },
-        ]}
-      >
-        <View style={styles.handleBar} />
-
-        <Text style={styles.title}>Comments ({comments.length})</Text>
-
-        <FlatList
-          ref={listRef}
-          data={comments}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.commentList}
-          keyboardShouldPersistTaps="handled"
-          ListEmptyComponent={
-            <Text style={styles.emptyText}>No comments yet. Be the first!</Text>
-          }
-          renderItem={({ item }) => (
-            <View style={styles.commentRow}>
-              <View style={styles.avatar}>
-                <Text style={styles.avatarText}>
-                  {item.user.username[0].toUpperCase()}
-                </Text>
-              </View>
-              <View style={styles.commentBubble}>
-                <Text style={styles.commentUsername}>{item.user.username}</Text>
-                <Text style={styles.commentText}>{item.text}</Text>
-              </View>
-            </View>
-          )}
+      {/* Full-screen wrapper — backdrop tap closes, sheet sits at bottom */}
+      <View style={styles.wrapper}>
+        <Pressable
+          style={StyleSheet.absoluteFill}
+          onPress={() => {
+            Keyboard.dismiss();
+            onClose();
+          }}
         />
 
-        <View style={styles.inputRow}>
-          <TextInput
-            style={styles.input}
-            placeholder="Write a comment..."
-            placeholderTextColor="#9CA3AF"
-            value={text}
-            onChangeText={setText}
-            multiline
-            maxLength={300}
-            returnKeyType="send"
-            onSubmitEditing={handleSubmit}
-            blurOnSubmit={false}
-          />
-          <TouchableOpacity
-            style={[
-              styles.sendBtn,
-              (!text.trim() || submitting) && styles.sendBtnDisabled,
-            ]}
-            onPress={handleSubmit}
-            disabled={!text.trim() || submitting}
+        <Animated.View
+          style={[styles.sheet, { transform: [{ translateY: slideAnim }] }]}
+        >
+          {/*
+            KeyboardAvoidingView INSIDE the Modal + behavior="padding"
+            is the only combo that works correctly on Android.
+            It shrinks the available height so the input stays visible.
+          */}
+          <KeyboardAvoidingView
+            style={styles.kavFill}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
           >
-            {submitting ? (
-              <ActivityIndicator size="small" color="#fff" />
-            ) : (
-              <Text style={styles.sendText}>Send</Text>
-            )}
-          </TouchableOpacity>
-        </View>
-      </Animated.View>
+            <View style={styles.handleBar} />
+
+            <Text style={styles.title}>Comments ({comments.length})</Text>
+
+            <FlatList
+              ref={listRef}
+              data={comments}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={styles.commentList}
+              keyboardShouldPersistTaps="handled"
+              ListEmptyComponent={
+                <Text style={styles.emptyText}>
+                  No comments yet. Be the first!
+                </Text>
+              }
+              renderItem={({ item }) => (
+                <View style={styles.commentRow}>
+                  <View style={styles.avatar}>
+                    <Text style={styles.avatarText}>
+                      {item.user.username[0].toUpperCase()}
+                    </Text>
+                  </View>
+                  <View style={styles.commentBubble}>
+                    <Text style={styles.commentUsername}>
+                      {item.user.username}
+                    </Text>
+                    <Text style={styles.commentText}>{item.text}</Text>
+                  </View>
+                </View>
+              )}
+            />
+
+            <View
+              style={[
+                styles.inputRow,
+                { paddingBottom: insets.bottom > 0 ? insets.bottom : 16 },
+              ]}
+            >
+              <TextInput
+                style={styles.input}
+                placeholder="Write a comment..."
+                placeholderTextColor="#9CA3AF"
+                value={text}
+                onChangeText={setText}
+                multiline
+                maxLength={300}
+                returnKeyType="send"
+                onSubmitEditing={handleSubmit}
+                blurOnSubmit={false}
+              />
+              <TouchableOpacity
+                style={[
+                  styles.sendBtn,
+                  (!text.trim() || submitting) && styles.sendBtnDisabled,
+                ]}
+                onPress={handleSubmit}
+                disabled={!text.trim() || submitting}
+              >
+                {submitting ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Text style={styles.sendText}>Send</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </KeyboardAvoidingView>
+        </Animated.View>
+      </View>
     </Modal>
   );
 };
@@ -193,18 +193,19 @@ const CommentSheet = ({
 export default CommentSheet;
 
 const styles = StyleSheet.create({
-  backdrop: {
+  wrapper: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "flex-end", // keeps sheet pinned to bottom
   },
   sheet: {
-    position: "absolute",
-    left: 0,
-    right: 0,
     height: SHEET_HEIGHT,
     backgroundColor: "#fff",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+    overflow: "hidden", // clips KAV children to rounded corners
+  },
+  kavFill: {
+    flex: 1, // KAV must fill the sheet so it can shrink
   },
   handleBar: {
     width: 40,
@@ -273,7 +274,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingHorizontal: 16,
     paddingTop: 10,
-    paddingBottom: Platform.OS === "ios" ? 30 : 16,
     gap: 10,
     borderTopWidth: 1,
     borderTopColor: "#F3F4F6",

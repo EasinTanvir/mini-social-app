@@ -57,9 +57,7 @@ const LoginPage = () => {
   return (
     <LinearGradient colors={["#4F8EF7", "#7B61FF"]} style={styles.gradient}>
       <SafeAreaView style={styles.container}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-        >
+        <KeyboardAvoidingView behavior="padding">
           <View style={styles.card}>
             <Text style={styles.title}>Welcome Back </Text>
 
