@@ -4,6 +4,7 @@ import {
   Dimensions,
   FlatList,
   Keyboard,
+  KeyboardEvent,
   Platform,
 } from "react-native";
 import { Comment } from "@/types/post.types";
@@ -24,8 +25,10 @@ export const useCommentSheet = (
   const [submitting, setSubmitting] = useState(false);
 
   const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
+  const keyboardOffset = useRef(new Animated.Value(0)).current;
   const listRef = useRef<FlatList>(null);
 
+  // Sheet open/close animation
   useEffect(() => {
     if (visible) {
       Animated.spring(slideAnim, {
@@ -34,6 +37,8 @@ export const useCommentSheet = (
         bounciness: 0,
       }).start();
     } else {
+      // Reset keyboard offset when sheet closes
+      keyboardOffset.setValue(0);
       Animated.timing(slideAnim, {
         toValue: SCREEN_HEIGHT,
         duration: 250,
@@ -42,13 +47,38 @@ export const useCommentSheet = (
     }
   }, [visible]);
 
+  // Keyboard listeners — push sheet up on Android, scroll list on both
   useEffect(() => {
-    const event =
+    const showEvent =
       Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
-    const sub = Keyboard.addListener(event, () => {
+    const hideEvent =
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+
+    const onShow = (e: KeyboardEvent) => {
+      Animated.timing(keyboardOffset, {
+        toValue: -e.endCoordinates.height,
+        duration: Platform.OS === "ios" ? e.duration : 200,
+        useNativeDriver: true,
+      }).start();
+
       setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 100);
-    });
-    return () => sub.remove();
+    };
+
+    const onHide = (e: KeyboardEvent) => {
+      Animated.timing(keyboardOffset, {
+        toValue: 0,
+        duration: Platform.OS === "ios" ? e.duration : 200,
+        useNativeDriver: true,
+      }).start();
+    };
+
+    const showSub = Keyboard.addListener(showEvent, onShow);
+    const hideSub = Keyboard.addListener(hideEvent, onHide);
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
   }, []);
 
   const handleSubmit = async () => {
@@ -74,10 +104,9 @@ export const useCommentSheet = (
   return {
     text,
     submitting,
-
     slideAnim,
+    keyboardOffset,
     listRef,
-
     setText,
     handleSubmit,
     handleClose,

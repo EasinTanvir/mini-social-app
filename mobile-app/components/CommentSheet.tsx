@@ -34,6 +34,7 @@ const CommentSheet = ({
     text,
     submitting,
     slideAnim,
+    keyboardOffset,
     listRef,
     setText,
     handleSubmit,
@@ -59,7 +60,15 @@ const CommentSheet = ({
 
           {/* 2. Animated Sheet containing everything else */}
           <Animated.View
-            style={[styles.sheet, { transform: [{ translateY: slideAnim }] }]}
+            style={[
+              styles.sheet,
+              {
+                transform: [
+                  { translateY: slideAnim },
+                  { translateY: keyboardOffset },
+                ],
+              },
+            ]}
           >
             <View style={styles.handleBar} />
 
@@ -96,7 +105,7 @@ const CommentSheet = ({
             <View
               style={[
                 styles.inputRow,
-                { paddingBottom: insets.bottom > 0 ? insets.bottom : 16 },
+                { paddingBottom: insets.bottom > 0 ? insets.bottom + 10 : 16 },
               ]}
             >
               <TextInput
