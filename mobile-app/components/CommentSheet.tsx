@@ -59,7 +59,7 @@ const CommentSheet = ({
             style={[
               styles.sheet,
               {
-                height: SHEET_HEIGHT,
+                height: SHEET_HEIGHT, //
                 transform: [{ translateY: slideAnim }],
               },
             ]}
@@ -98,7 +98,7 @@ const CommentSheet = ({
             <View
               style={[
                 styles.inputRow,
-                { paddingBottom: insets.bottom > 0 ? 15 : 16 },
+                { paddingBottom: insets.bottom > 0 ? insets.bottom + 10 : 16 },
               ]}
             >
               <TextInput
