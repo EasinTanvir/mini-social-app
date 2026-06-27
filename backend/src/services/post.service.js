@@ -150,7 +150,7 @@ module.exports = {
       });
       if (author?.fcmToken) {
         await sendFCMNotification(author.fcmToken, {
-          title: "New Like ❤️",
+          title: "New Like",
           body: `Someone liked your post`,
           data: { postId },
         });
@@ -197,7 +197,7 @@ module.exports = {
       });
       if (author?.fcmToken) {
         await sendFCMNotification(author.fcmToken, {
-          title: "New Comment 💬",
+          title: "New Comment",
           body: comment.user.username
             ? `${comment.user.username} commented on your post`
             : "Someone commented on your post",
