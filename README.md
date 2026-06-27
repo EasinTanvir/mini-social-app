@@ -70,10 +70,6 @@ FIREBASE_CLIENT_EMAIL=
 FIREBASE_PRIVATE_KEY=
 ```
 
-# For Prisma migration you need to follow this structure
-
-DATABASE_URL="mongodb+srv://<USERNAME>:<PASSWORD>@firstcluster.ydgyukf.mongodb.net/<DBNAME>?retryWrites=true&w=majority&authSource=admin"
-
 To get the Firebase values, go to Firebase Console → Project Settings → Service Accounts → Generate new private key. Open the downloaded JSON and copy:
 
 | Env Variable            | Key in JSON                     |
