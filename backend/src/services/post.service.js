@@ -136,10 +136,18 @@ module.exports = {
       };
     }
 
-    await prismaCli.like.create({
+    const like = await prismaCli.like.create({
       data: {
         userId,
         postId,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
       },
     });
 
@@ -151,7 +159,10 @@ module.exports = {
       if (author?.fcmToken) {
         await sendFCMNotification(author.fcmToken, {
           title: "New Like",
-          body: `Someone liked your post`,
+          body: like.user.username
+            ? `${like.user.username} liked your post`
+            : "Someone liked on your post",
+
           data: { postId },
         });
       }
