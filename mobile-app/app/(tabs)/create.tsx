@@ -10,7 +10,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useForm } from "react-hook-form";
 
 import FormInput from "@/components/FormInput";
@@ -62,7 +61,7 @@ const CreatePost = () => {
     return () => showListener.remove();
   }, []);
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <KeyboardAvoidingView
         style={styles.keyboardContainer}
         behavior="padding"
@@ -104,7 +103,7 @@ const CreatePost = () => {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 };
 
