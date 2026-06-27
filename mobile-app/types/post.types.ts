@@ -46,3 +46,7 @@ export interface PostCardProps {
   onComment: () => void;
   isTablet?: boolean;
 }
+
+export interface CreatePostRequest {
+  text: string;
+}

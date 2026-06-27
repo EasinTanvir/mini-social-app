@@ -17,10 +17,7 @@ import FormInput from "@/components/FormInput";
 import { useRouter } from "expo-router";
 import { useGlobalContext } from "@/contextApis/GlobalContext";
 import { createPost } from "@/services/post.service";
-
-type CreatePostRequest = {
-  text: string;
-};
+import { CreatePostRequest } from "@/types/post.types";
 
 const CreatePost = () => {
   const {
