@@ -18,7 +18,7 @@ export const getPosts = async (
   });
 
   const { data } = await api.get<GetPostsResponse>(
-    `/post?${params}`,
+    `/posts?${params}`,
     authHeader(token),
   );
   return data;
@@ -29,7 +29,7 @@ export const createPost = async (
   text: string,
 ): Promise<{ message: string }> => {
   const { data } = await api.post<{ message: string }>(
-    "/post",
+    "/posts",
     { text },
     authHeader(token),
   );
@@ -38,7 +38,7 @@ export const createPost = async (
 
 export const likePost = async (token: string, postId: string) => {
   const { data } = await api.post(
-    `/post/${postId}/like`,
+    `/posts/${postId}/like`,
     {},
     authHeader(token),
   );
@@ -51,7 +51,7 @@ export const commentOnPost = async (
   text: string,
 ) => {
   const { data } = await api.post(
-    `/post/${postId}/comment`,
+    `/posts/${postId}/comment`,
     { text },
     authHeader(token),
   );

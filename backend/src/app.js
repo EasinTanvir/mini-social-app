@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(morgan("dev"));
 
 app.use(`/api/v1/auth`, authRoute);
-app.use(`/api/v1/post`, postRoute);
+app.use(`/api/v1/posts`, postRoute);
 
 app.use(invalidRoutes);
 app.use(errorMethod);
