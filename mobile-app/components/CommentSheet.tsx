@@ -1,10 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import {
   ActivityIndicator,
   Animated,
   Dimensions,
   FlatList,
-  Keyboard,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -16,17 +15,8 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Comment } from "@/types/post.types";
-import { commentOnPost } from "@/services/post.service";
-import { useGlobalContext } from "@/contextApis/GlobalContext";
-
-interface Props {
-  visible: boolean;
-  postId: string;
-  comments: Comment[];
-  onClose: () => void;
-  onCommentAdded: (postId: string, comment: Comment) => void;
-}
+import { CommentSheetProps } from "@/types/post.types";
+import { useCommentSheet } from "@/hooks/useCommentSheet";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 const SHEET_HEIGHT = SCREEN_HEIGHT * 0.65;
@@ -37,86 +27,36 @@ const CommentSheet = ({
   comments,
   onClose,
   onCommentAdded,
-}: Props) => {
-  const { token } = useGlobalContext();
+}: CommentSheetProps) => {
   const insets = useSafeAreaInsets();
-  const [text, setText] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
-  const listRef = useRef<FlatList>(null);
 
-  // ─── Sheet animation ──────────────────────────────────────────────────────
-  useEffect(() => {
-    if (visible) {
-      Animated.spring(slideAnim, {
-        toValue: 0,
-        useNativeDriver: true,
-        bounciness: 0,
-      }).start();
-    } else {
-      Animated.timing(slideAnim, {
-        toValue: SCREEN_HEIGHT,
-        duration: 250,
-        useNativeDriver: true,
-      }).start();
-    }
-  }, [visible]);
-
-  // ─── Scroll to end when keyboard opens ───────────────────────────────────
-  useEffect(() => {
-    const event =
-      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
-    const sub = Keyboard.addListener(event, () => {
-      setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 100);
-    });
-    return () => sub.remove();
-  }, []);
-
-  const handleSubmit = async () => {
-    if (!text.trim() || submitting) return;
-    setSubmitting(true);
-    try {
-      const res = await commentOnPost(token!, postId, text.trim());
-      onCommentAdded(postId, res.comment);
-      setText("");
-      setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 100);
-    } catch (e) {
-      console.log("Comment error:", e);
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  const {
+    text,
+    submitting,
+    slideAnim,
+    listRef,
+    setText,
+    handleSubmit,
+    handleClose,
+  } = useCommentSheet(visible, postId, onCommentAdded, onClose);
 
   return (
     <Modal
       visible={visible}
       transparent
       animationType="none"
-      onRequestClose={onClose}
+      onRequestClose={handleClose}
       statusBarTranslucent
     >
-      {/* Full-screen wrapper — backdrop tap closes, sheet sits at bottom */}
       <View style={styles.wrapper}>
-        <Pressable
-          style={StyleSheet.absoluteFill}
-          onPress={() => {
-            Keyboard.dismiss();
-            onClose();
-          }}
-        />
+        <Pressable style={StyleSheet.absoluteFill} onPress={handleClose} />
 
         <Animated.View
           style={[styles.sheet, { transform: [{ translateY: slideAnim }] }]}
         >
-          {/*
-            KeyboardAvoidingView INSIDE the Modal + behavior="padding"
-            is the only combo that works correctly on Android.
-            It shrinks the available height so the input stays visible.
-          */}
           <KeyboardAvoidingView
             style={styles.kavFill}
             behavior={Platform.OS === "ios" ? "padding" : "height"}
-            keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
           >
             <View style={styles.handleBar} />
 
@@ -153,6 +93,7 @@ const CommentSheet = ({
             <View
               style={[
                 styles.inputRow,
+
                 { paddingBottom: insets.bottom > 0 ? insets.bottom : 16 },
               ]}
             >
@@ -195,17 +136,17 @@ export default CommentSheet;
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
-    justifyContent: "flex-end", // keeps sheet pinned to bottom
+    justifyContent: "flex-end",
   },
   sheet: {
     height: SHEET_HEIGHT,
     backgroundColor: "#fff",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    overflow: "hidden", // clips KAV children to rounded corners
+    overflow: "hidden",
   },
   kavFill: {
-    flex: 1, // KAV must fill the sheet so it can shrink
+    flex: 1,
   },
   handleBar: {
     width: 40,

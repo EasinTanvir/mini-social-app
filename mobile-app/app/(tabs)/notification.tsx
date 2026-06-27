@@ -14,7 +14,6 @@ const Notification = () => {
 
   return (
     <View>
-      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>Notifications</Text>
         {notifications.length > 0 && (

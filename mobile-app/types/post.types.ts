@@ -50,3 +50,11 @@ export interface PostCardProps {
 export interface CreatePostRequest {
   text: string;
 }
+
+export interface CommentSheetProps {
+  visible: boolean;
+  postId: string;
+  comments: Comment[];
+  onClose: () => void;
+  onCommentAdded: (postId: string, comment: Comment) => void;
+}
