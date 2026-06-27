@@ -48,15 +48,18 @@ const CommentSheet = ({
       onRequestClose={handleClose}
       statusBarTranslucent
     >
-      <View style={styles.wrapper}>
-        <Pressable style={StyleSheet.absoluteFill} onPress={handleClose} />
+      {/* 1. KAV moved to the root inside the modal */}
+      <KeyboardAvoidingView
+        style={styles.kavFill}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <View style={styles.wrapper}>
+          {/* Backdrop remains pressable to close */}
+          <Pressable style={StyleSheet.absoluteFill} onPress={handleClose} />
 
-        <Animated.View
-          style={[styles.sheet, { transform: [{ translateY: slideAnim }] }]}
-        >
-          <KeyboardAvoidingView
-            style={styles.kavFill}
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
+          {/* 2. Animated Sheet containing everything else */}
+          <Animated.View
+            style={[styles.sheet, { transform: [{ translateY: slideAnim }] }]}
           >
             <View style={styles.handleBar} />
 
@@ -93,7 +96,6 @@ const CommentSheet = ({
             <View
               style={[
                 styles.inputRow,
-
                 { paddingBottom: insets.bottom > 0 ? insets.bottom : 16 },
               ]}
             >
@@ -124,9 +126,9 @@ const CommentSheet = ({
                 )}
               </TouchableOpacity>
             </View>
-          </KeyboardAvoidingView>
-        </Animated.View>
-      </View>
+          </Animated.View>
+        </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };
@@ -134,9 +136,13 @@ const CommentSheet = ({
 export default CommentSheet;
 
 const styles = StyleSheet.create({
+  kavFill: {
+    flex: 1,
+  },
   wrapper: {
     flex: 1,
     justifyContent: "flex-end",
+    backgroundColor: "rgba(0, 0, 0, 0.4)", // Added a semi-transparent background for modern sheet view
   },
   sheet: {
     height: SHEET_HEIGHT,
@@ -144,9 +150,6 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     overflow: "hidden",
-  },
-  kavFill: {
-    flex: 1,
   },
   handleBar: {
     width: 40,
