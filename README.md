@@ -119,3 +119,13 @@ npx expo start
 ```
 
 > **Note for rebuilding the APK:** Place a `google-services.json` file in the `mobile-app/` root directory. The file must be registered with Android package name `com.easintanvir.mobileapp` (Firebase Console → Project Settings → General → Add Android app). Then run `eas build --platform android --profile preview`.
+
+Note
+
+There is a keyboard overlapping issue in the APK provided when opening the comment modal and focusing on the input field.
+
+This issue has already been fixed in the latest source code included in this repository. Unfortunately, I was unable to generate a new APK because I had already reached the 15-build limit of the free Expo EAS plan.
+
+I sincerely apologize for this inconvenience. Aside from this APK-specific issue, all core functionalities—including authentication, posting, likes, comments, feed filtering, and Firebase push notifications—are fully implemented and working correctly.
+
+Thank you for taking the time to review my submission.
