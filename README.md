@@ -10,7 +10,7 @@
 
 ## Links
 
-- **APK Download:** _add google drive link here_
+- **APK Download:** https://drive.google.com/file/d/1e_ONneXOiCgj6DdIqZJVabZUuLbg-AhJ/view?usp=drive_link
 - **GitHub:** https://github.com/EasinTanvir/mini-social-app
 - **Backend Base URL:** https://mini-social-app-cvs0.onrender.com/api/v1
 
