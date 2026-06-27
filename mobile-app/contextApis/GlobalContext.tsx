@@ -8,7 +8,6 @@ import React, {
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Notifications from "expo-notifications";
-import { Alert } from "react-native";
 import registerForPushNotifications from "../utils/notifications";
 
 interface User {
@@ -145,8 +144,8 @@ export const GlobalContextProvider = ({
         const b = body ?? "";
 
         addNotification(t, b);
-        Alert.alert(t, b);
-        triggerFeedRefresh();
+        //Alert.alert(t, b);
+        //triggerFeedRefresh();
       });
 
     responseListener.current =
@@ -155,7 +154,7 @@ export const GlobalContextProvider = ({
         const postId = data?.postId as string | undefined;
         if (postId) {
           console.log("User tapped notification for postId:", postId);
-          triggerFeedRefresh();
+          //triggerFeedRefresh();
         }
       });
 
