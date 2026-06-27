@@ -34,7 +34,6 @@ const CommentSheet = ({
     text,
     submitting,
     slideAnim,
-    keyboardOffset,
     listRef,
     setText,
     handleSubmit,
@@ -49,29 +48,23 @@ const CommentSheet = ({
       onRequestClose={handleClose}
       statusBarTranslucent
     >
-      {/* 1. KAV moved to the root inside the modal */}
       <KeyboardAvoidingView
         style={styles.kavFill}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <View style={styles.wrapper}>
-          {/* Backdrop remains pressable to close */}
           <Pressable style={StyleSheet.absoluteFill} onPress={handleClose} />
 
-          {/* 2. Animated Sheet containing everything else */}
           <Animated.View
             style={[
               styles.sheet,
               {
-                transform: [
-                  { translateY: slideAnim },
-                  { translateY: keyboardOffset },
-                ],
+                height: SHEET_HEIGHT,
+                transform: [{ translateY: slideAnim }],
               },
             ]}
           >
             <View style={styles.handleBar} />
-
             <Text style={styles.title}>Comments ({comments.length})</Text>
 
             <FlatList
@@ -105,7 +98,7 @@ const CommentSheet = ({
             <View
               style={[
                 styles.inputRow,
-                { paddingBottom: insets.bottom > 0 ? insets.bottom + 10 : 16 },
+                { paddingBottom: insets.bottom > 0 ? 15 : 16 },
               ]}
             >
               <TextInput
@@ -151,10 +144,9 @@ const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
     justifyContent: "flex-end",
-    backgroundColor: "rgba(0, 0, 0, 0.4)", // Added a semi-transparent background for modern sheet view
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
   },
   sheet: {
-    height: SHEET_HEIGHT,
     backgroundColor: "#fff",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
