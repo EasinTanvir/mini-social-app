@@ -39,3 +39,10 @@ export interface GetPostsResponse {
 
   posts: Post[];
 }
+
+export interface PostCardProps {
+  post: Post;
+  onLike: (id: string) => void;
+  onComment: () => void;
+  isTablet?: boolean;
+}

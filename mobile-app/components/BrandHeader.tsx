@@ -10,6 +10,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useGlobalContext } from "@/contextApis/GlobalContext";
+import { Link } from "expo-router";
 
 interface Props {
   onSearch?: (username: string) => void;
@@ -74,9 +75,11 @@ export const BrandHeader = ({ onSearch }: Props) => {
     <View style={[styles.headerContainer, { paddingTop: insets.top + 10 }]}>
       {!searchMode && (
         <View style={styles.brandWrapper}>
-          <Text style={styles.brandText}>
-            Source<Text style={styles.brandAccent}>Club</Text>
-          </Text>
+          <Link href="/">
+            <Text style={styles.brandText}>
+              Source<Text style={styles.brandAccent}>Club</Text>
+            </Text>
+          </Link>
         </View>
       )}
 

@@ -4,24 +4,9 @@ import {
 } from "@/contextApis/GlobalContext";
 import { Stack } from "expo-router";
 import React from "react";
-import { ActivityIndicator, View } from "react-native";
 
 const LayoutWrapper = () => {
-  const { isLoggedIn, loading } = useGlobalContext();
-
-  if (loading) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
+  const { isLoggedIn } = useGlobalContext();
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
