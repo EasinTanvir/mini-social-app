@@ -3,7 +3,7 @@ import { getPosts, likePost } from "@/services/post.service";
 import { Comment, Post } from "@/types/post.types";
 import { useGlobalContext } from "@/contextApis/GlobalContext";
 
-const PAGE_LIMIT = 4;
+const PAGE_LIMIT = 5;
 
 export const useNewsFeed = () => {
   const { token, usernameFilter, feedRefreshKey } = useGlobalContext();
