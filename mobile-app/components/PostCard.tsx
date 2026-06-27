@@ -2,6 +2,7 @@ import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { PostCardProps } from "@/types/post.types";
+import { Ionicons } from "@expo/vector-icons";
 
 const PostCard = ({ post, onLike, onComment, isTablet }: PostCardProps) => {
   return (
@@ -41,7 +42,11 @@ const PostCard = ({ post, onLike, onComment, isTablet }: PostCardProps) => {
           activeOpacity={0.7}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <Text style={styles.actionIcon}>{post.likedByMe ? "❤️" : "🤍"}</Text>
+          <Ionicons
+            name={post.likedByMe ? "heart" : "heart-outline"}
+            size={20}
+            color={post.likedByMe ? "#EF4444" : "#6B7280"}
+          />
           <Text style={[styles.actionText, post.likedByMe && styles.likedText]}>
             {post.likeCount} {post.likeCount === 1 ? "Like" : "Likes"}
           </Text>
@@ -53,7 +58,7 @@ const PostCard = ({ post, onLike, onComment, isTablet }: PostCardProps) => {
           activeOpacity={0.7}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <Text style={styles.actionIcon}>💬</Text>
+          <Ionicons name="chatbubble-outline" size={20} color="#6B7280" />
           <Text style={styles.actionText}>
             {post.commentCount}{" "}
             {post.commentCount === 1 ? "Comment" : "Comments"}
