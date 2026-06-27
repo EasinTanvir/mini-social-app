@@ -8,11 +8,58 @@
 └── README.md
 ```
 
-## Backend Setup
+## Links
+
+- **APK Download:** _add google drive link here_
+- **GitHub:** https://github.com/EasinTanvir/mini-social-app
+- **Backend Base URL:** https://mini-social-app-cvs0.onrender.com/api/v1
+
+> **Note:** The backend is hosted on a free tier (Render). The first request may take 10–20 seconds while the server wakes from sleep. Subsequent requests will be fast.
+
+## Try the App (No Setup Required)
+
+Download the APK from the Google Drive link above and install it on your Android device or tablet.
+
+> Since this APK is distributed outside the Play Store, Android may show a warning — tap **"Install anyway"** to proceed.
+
+Once installed:
+
+1. Open the app and create an account with your email, password, and username
+2. Log in — you will land on the news feed
+3. **Allow notifications** when prompted to receive push notifications
+4. Browse the feed, create posts, like and comment on others' posts
+5. When someone likes or comments on your post, you will receive a push notification
+6. A badge on the Notifications tab shows the number of unread notifications — tap it to see all notifications
+
+The app is already connected to a live production backend. No local setup is needed.
+
+---
+
+## API Endpoints
+
+Base URL: `https://mini-social-app-cvs0.onrender.com/api/v1`
+
+All endpoints except signup and login require: `Authorization: Bearer <token>`
+
+| Method | Endpoint                           | Description                              |
+| ------ | ---------------------------------- | ---------------------------------------- |
+| POST   | `/auth/signup`                     | Register `{ username, email, password }` |
+| POST   | `/auth/login`                      | Login `{ email, password }`              |
+| POST   | `/auth/fcm-token`                  | Save device FCM token `{ fcmToken }`     |
+| GET    | `/posts?page=1&limit=10&username=` | Get paginated posts (newest first)       |
+| POST   | `/posts`                           | Create post `{ text }`                   |
+| POST   | `/posts/:id/like`                  | Toggle like on a post                    |
+| POST   | `/posts/:id/comment`               | Add comment `{ text }`                   |
+
+---
+
+## Backend Setup (Manual)
+
+Entry point: `server.js`
 
 ### Step 1 — Create environment file
 
-Create a `.env` file inside the `backend/` folder and fill in your values:
+Create a `.env` file inside the `backend/` folder:
 
 ```env
 PORT=
@@ -22,6 +69,18 @@ FIREBASE_PROJECT_ID=
 FIREBASE_CLIENT_EMAIL=
 FIREBASE_PRIVATE_KEY=
 ```
+
+# For Prisma migration you need to follow this structure
+
+DATABASE_URL="mongodb+srv://<USERNAME>:<PASSWORD>@firstcluster.ydgyukf.mongodb.net/<DBNAME>?retryWrites=true&w=majority&authSource=admin"
+
+To get the Firebase values, go to Firebase Console → Project Settings → Service Accounts → Generate new private key. Open the downloaded JSON and copy:
+
+| Env Variable            | Key in JSON                     |
+| ----------------------- | ------------------------------- |
+| `FIREBASE_PROJECT_ID`   | `project_id`                    |
+| `FIREBASE_CLIENT_EMAIL` | `client_email`                  |
+| `FIREBASE_PRIVATE_KEY`  | `private_key` (keep the quotes) |
 
 ### Step 2 — Install dependencies
 
@@ -40,33 +99,9 @@ Server runs at `http://localhost:<PORT>/api/v1`
 
 ---
 
-## API Endpoints
+## Mobile App — Run from Source (Optional)
 
-All endpoints except signup and login require: `Authorization: Bearer <token>`
-
-| Method | Endpoint                          | Description                              |
-| ------ | --------------------------------- | ---------------------------------------- |
-| POST   | `/auth/signup`                    | Register `{ username, email, password }` |
-| POST   | `/auth/login`                     | Login `{ email, password }`              |
-| POST   | `/auth/fcm-token`                 | Save device FCM token `{ fcmToken }`     |
-| GET    | `/post?page=1&limit=10&username=` | Get paginated posts (newest first)       |
-| POST   | `/post`                           | Create post `{ text }`                   |
-| POST   | `/post/:id/like`                  | Toggle like on a post                    |
-| POST   | `/post/:id/comment`               | Add comment `{ text }`                   |
-
----
-
-## Mobile App
-
-The APK is ready to install — no build step needed.
-
-1. Download and install the APK from the link
-2. Open the app on your Android device or tablet
-3. The app is already connected to a live backend — no local setup required
-
-### Run from source (optional)
-
-If you want to run the app manually instead of using the APK:
+The APK is already built and ready. If you want to run from source:
 
 ```bash
 cd mobile-app
@@ -76,9 +111,10 @@ npm install
 Create a `.env` file inside `mobile-app/`:
 
 ```env
-# Use your machine's LAN IP, not localhost
 EXPO_PUBLIC_API_URL=http://<YOUR_LOCAL_IP>:<BACKEND_PORT>/api/v1
 ```
+
+> Use your machine's LAN IP (e.g. `192.168.1.5`), not `localhost` — the device cannot reach `localhost` over the network.
 
 Then start:
 
@@ -86,4 +122,4 @@ Then start:
 npx expo start
 ```
 
-> **Note for rebuilding:** If you want to build the APK from source, place a `google-services.json` file in the `mobile-app/` root directory. The file must be registered with Android package name `com.easintanvir.mobileapp` (Firebase Console → Project Settings → General → Add Android app).
+> **Note for rebuilding the APK:** Place a `google-services.json` file in the `mobile-app/` root directory. The file must be registered with Android package name `com.easintanvir.mobileapp` (Firebase Console → Project Settings → General → Add Android app). Then run `eas build --platform android --profile preview`.
